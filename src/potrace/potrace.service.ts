@@ -143,7 +143,7 @@ export class PotraceService {
         {
           // https://www.npmjs.com/package/potrace#usage
           // number of colors
-          // steps: 4,
+          steps: 4,
         },
         function (err, svg) {
           if (err) return reject(err);
@@ -263,7 +263,19 @@ export class PotraceService {
   }
 
   async getOptimizedSvg(svg: string) {
-    return (await svgo.optimize(svg)).data;
+    const result = await svgo.optimize(svg, {
+      plugins: [
+        {
+          name: 'preset-default',
+          params: {
+            overrides: {
+              removeViewBox: false,
+            },
+          },
+        },
+      ],
+    });
+    return result.data;
   }
 
   async processFiles(files: Express.Multer.File[], colorMode: ColorMode) {
